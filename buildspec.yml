@@ -1,0 +1,24 @@
+version: 0.2
+
+
+phases:
+  pre_build:
+    commands:
+      - export CONTAINER_REPOSITORY_URL=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/llm-backend-app
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+
+  build:
+    on-failure: ABORT
+    commands:
+      - echo Start building docker image on `date`
+      - docker build -t $CONTAINER_REPOSITORY_URL:$IMAGE_TAG -f Dockerfile-prod .
+      - docker tag $CONTAINER_REPOSITORY_URL:$IMAGE_TAG $CONTAINER_REPOSITORY_URL:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $CONTAINER_REPOSITORY_URL:$IMAGE_TAG
