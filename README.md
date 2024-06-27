@@ -2,7 +2,7 @@
 
 # Description
 The repository invovles the FastAPI backend for interacting with Sagemaker endpoints for LLMs. We can create, stop, delete and call the endpoints.
-There's a websocket endpoint for listening the creation status of endpoints.
+There's a websocket endpoint for listening the creation status of Sagemaker endpoints.
 
 # Local development
 ## Prerequisites
